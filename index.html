@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Make Difference</title>
+
+<style>
+body{
+background:#000;
+color:#FFD700;
+font-family:Arial;
+margin:0;
+padding:0;
+text-align:center;
+}
+
+header{
+padding:20px;
+font-size:28px;
+font-weight:bold;
+border-bottom:1px solid #FFD700;
+}
+
+.container{
+padding:20px;
+}
+
+button{
+background:#111;
+color:#FFD700;
+border:1px solid #FFD700;
+padding:10px 15px;
+margin:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#FFD700;
+color:#000;
+}
+
+input,select{
+background:#111;
+color:#FFD700;
+border:1px solid #FFD700;
+padding:8px;
+margin:5px;
+width:90%;
+}
+
+.hidden{display:none;}
+
+.card{
+border:1px solid #FFD700;
+padding:15px;
+margin:15px auto;
+width:90%;
+max-width:500px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+Make Difference
+</header>
+
+<div class="container">
+
+<button onclick="show('add')">تسجيل مشترك جديد</button>
+<button onclick="show('consume')">تسجيل استهلاك</button>
+<button onclick="show('expiring')">قرب الانتهاء</button>
+
+<!-- تسجيل مشترك -->
+<div id="add" class="card hidden">
+<h3>تسجيل مشترك</h3>
+<input id="name" placeholder="اسم المشترك">
+<input id="phone" placeholder="رقم الجوال">
+<select id="duration">
+<option value="10">10 أيام</option>
+<option value="36">36 يوم</option>
+</select>
+<input id="chicken" placeholder="عدد الدجاج">
+<input id="meat" placeholder="عدد اللحم">
+<input id="fish" placeholder="عدد السمك">
+<input id="snack" placeholder="عدد السناك">
+<input id="protein_weight" placeholder="وزن البروتين">
+<input id="carb_weight" placeholder="وزن الكارب">
+<button onclick="addSubscriber()">حفظ</button>
+</div>
+
+<!-- استهلاك -->
+<div id="consume" class="card hidden">
+<h3>تسجيل استهلاك</h3>
+<input id="searchId" placeholder="ادخل ID">
+<button onclick="consume()">تسجيل</button>
+</div>
+
+<!-- قرب الانتهاء -->
+<div id="expiring" class="card hidden">
+<h3>الاشتراكات القريبة من الانتهاء</h3>
+<button onclick="getExpiring()">عرض</button>
+<div id="result"></div>
+</div>
+
+</div>
+
+<script>
+
+const WEB_APP_URL = "YOUR_WEB_APP_URL";
+
+function show(id){
+document.querySelectorAll('.card').forEach(c=>c.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+}
+
+function addSubscriber(){
+fetch(WEB_APP_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"addSubscriber",
+name:name.value,
+phone:phone.value,
+subscription_name:"Standard",
+duration:duration.value,
+chicken:chicken.value,
+meat:meat.value,
+fish:fish.value,
+snack:snack.value,
+protein_weight:protein_weight.value,
+carb_weight:carb_weight.value
+})
+}).then(r=>r.json())
+.then(d=>alert("تم التسجيل ✅\nID: "+d.id));
+}
+
+function consume(){
+fetch(WEB_APP_URL,{
+method:"POST",
+body:JSON.stringify({
+action:"consume",
+id:searchId.value,
+chicken:1,
+meat:0,
+fish:0,
+snack:0
+})
+}).then(()=>alert("تم تسجيل الاستهلاك ✅"));
+}
+
+function getExpiring(){
+fetch(WEB_APP_URL,{
+method:"POST",
+body:JSON.stringify({action:"getExpiring"})
+}).then(r=>r.json())
+.then(data=>{
+let html="";
+data.forEach(row=>{
+html+="<p>"+row.name+" | أيام: "+row.days+" | وجبات: "+row.meals+"</p>";
+});
+result.innerHTML=html;
+});
+}
+
+</script>
+
+</body>
+</html>
